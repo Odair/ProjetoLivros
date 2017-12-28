@@ -1,25 +1,29 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import * as BooksAPI from '../BooksAPI'
 
-class ListReading extends Component {
+class ListSearch extends Component {
 
+    updateBook = (ev, book) => {
+        console.log(ev)
+        BooksAPI.update(book, ev).then((data)=>{
+            this.props.onMove();
+        });
+      }
     render() {
 
-        const { title, books } = this.props;
-
+        const { title, booksSearch = []} = this.props;
+        
 
         return (
-            <div className="bookshelf">
-                <h2 className="bookshelf-title">{title}</h2>
-                <div className="bookshelf-books">
                     <ol className="books-grid">
-                        {({books = []}) => (books.map((book) => (
+                        {booksSearch.map((book) => (
                             <li key={book.id}>
                                 <div className="book">
                                     <div className="book-top">
-                                        <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: 'url("http://books.google.com/books/content?id=PGR2AwAAQBAJ&printsec=frontcover&img=1&zoom=1&imgtk=AFLRE73-GnPVEyb7MOCxDzOYF1PTQRuf6nCss9LMNOSWBpxBrz8Pm2_mFtWMMg_Y1dx92HT7cUoQBeSWjs3oEztBVhUeDFQX6-tWlWz1-feexS0mlJPjotcwFqAg6hBYDXuK_bkyHD-y&source=gbs_api")' }}></div>
+                                        <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: 'url({book.imageLinks.thumbnail})'}}></div>
                                         <div className="book-shelf-changer">
-                                            <select>
+                                            <select value={book.shelf} onChange={(event) => this.updateBook(event.target.value,book)}>
                                                 <option value="none" disabled>Move to...</option>
                                                 <option value="currentlyReading">Currently Reading</option>
                                                 <option value="wantToRead">Want to Read</option>
@@ -29,14 +33,13 @@ class ListReading extends Component {
                                         </div>
                                     </div>
                                     <div className="book-title">{book.title}</div>
-                                    <div className="book-authors">Harper Lee</div>
+                                    <div className="book-authors">{book.authors}</div>
                                 </div>
-                            </li>)))}
+                            </li>))}
 
                     </ol>
-                </div>
-            </div>)
+               )
     }
 }
 
-export default ListReading
+export default ListSearch

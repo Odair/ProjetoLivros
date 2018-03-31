@@ -6,14 +6,16 @@ class ListBooks extends Component {
 
     updateBook = (ev, book) => {
         console.log(ev)
-        BooksAPI.update(book, ev).then((data)=>{
+        BooksAPI.update(book, ev).then((data) => {
             this.props.onMove();
+        }).catch(error => {
+            console.log(error)
         });
-      }
+    }
     render() {
 
-        const { title, books = []} = this.props;
-        
+        const { title, books = [] } = this.props;
+
 
         return (
             <div className="bookshelf">
@@ -24,10 +26,10 @@ class ListBooks extends Component {
                             <li key={book.id}>
                                 <div className="book">
                                     <div className="book-top">
-                                        <div className="book-cover"><img  style={{ width: 128, height: 193}} src={book.imageLinks.thumbnail}/></div>
+                                        <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.thumbnail})` }}></div>
                                         <div className="book-shelf-changer">
-                                            <select value={book.shelf} onChange={(event) => this.updateBook(event.target.value,book)}>
-                                                <option value="none" disabled>Move to...</option>
+                                            <select value={book.shelf} onChange={(event) => this.updateBook(event.target.value, book)}>
+                                                <option value= "none" disabled>Move to...</option>
                                                 <option value="currentlyReading">Currently Reading</option>
                                                 <option value="wantToRead">Want to Read</option>
                                                 <option value="read">Read</option>

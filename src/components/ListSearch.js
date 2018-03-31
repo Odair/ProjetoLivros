@@ -6,7 +6,8 @@ class ListSearch extends Component {
 
     state = {
         query: '',
-        results: []
+        results: [],
+        erro: false
     }
 
     updateQuery = (query) => {
@@ -14,7 +15,15 @@ class ListSearch extends Component {
             query: query.trim()
         })
 
-        BooksAPI.search(query, 20).then((results) => { this.setState({ results }) })
+        if (query) {
+            BooksAPI.search(query, 20)
+                .then((results) => {
+                    results.length > 0 ? this.setState({ results: results, erro: false }) : this.setState({ results: [], erro: true })
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+        }
     }
 
 
@@ -26,9 +35,8 @@ class ListSearch extends Component {
     }
     render() {
 
-        const { query } = this.state;
 
-
+        const { query, results, erro } = this.state
 
         //showingBooks.sort(sortBy('author'))
 
@@ -41,26 +49,39 @@ class ListSearch extends Component {
                     </div>
                 </div>
                 <div className="search-books-results">
-                    <ol className="books-grid">
-                        {this.state.results.map((book) => (
-                            <li key={book.id}>
-                                <div className="book">
-                                    <div className="book-top">
-                                        <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: 'url(${book.imageLinks.thumbnail})' }}><img src={book.imageLinks.thumbnail}/></div>
-                                        <div className="book-shelf-changer">
-                                            <select value={book.shelf} onChange={(event) => this.updateBook(event.target.value, book)}>
-                                                <option value="none" disabled>Move to...</option>
-                                                <option value="currentlyReading">Currently Reading</option>
-                                                <option value="wantToRead">Want to Read</option>
-                                                <option value="read">Read</option>
-                                                <option value="none">None</option>
-                                            </select>
+                    {results.length > 0 && (
+                        <div>
+                            <h3>{results.length} books </h3>
+
+                            <ol className="books-grid">
+                                {results.map((book) => (
+                                    <li key={book.id}>
+                                        <div className="book">
+                                            <div className="book-top">
+                                                <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.thumbnail})` }}></div>
+                                                <div className="book-shelf-changer">
+                                                    <select value={book.shelf} onChange={(event) => this.updateBook(event.target.value, book)}>
+                                                        <option value="none" disabled>Move to...</option>
+                                                        <option value="currentlyReading">Currently Reading</option>
+                                                        <option value="wantToRead">Want to Read</option>
+                                                        <option value="read">Read</option>
+                                                        <option value="none">None</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div className="book-title">{book.title}</div>
+                                            <div className="book-authors">{book.authors}</div>
                                         </div>
-                                    </div>
-                                    <div className="book-title">{book.title}</div>
-                                    <div className="book-authors">{book.authors}</div>
-                                </div>
-                            </li>))}</ol>
+                                    </li>))}</ol>
+                        </div>
+                    )}
+                    {erro && (
+                        <div>
+                            <div className=''>
+                                <h3>No books were found!</h3>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         )

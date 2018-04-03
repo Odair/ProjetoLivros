@@ -11,22 +11,14 @@ class BooksApp extends React.Component {
     books: [],
     booksSearch: []
   }
-  componentDidMount() {
-    this.getBooks();
-  }
 
-  getBooks = () => {
-    BooksAPI.getAll().then((books) => {
-      this.setState({ books })
-    });
-  }
+  async componentDidMount() {
+    const books = await BooksAPI.getAll()
+    this.setState({ books })
 
-  searchBooks = () => {
-    BooksAPI.search().then((booksSearch) => {
-      this.setState({ booksSearch })
-    })
+    const filter = books => shelf => books.shelf(b => b.shelf === shelf)
+    const filterBy = filter(this.state.books)
   }
-
 
 
 
@@ -58,7 +50,7 @@ class BooksApp extends React.Component {
         <Route path='/search' render={(history) => (
 
 
-          <ListSearch onMove={this.getBooks} booksSearch={this.state.booksSearch} />
+          <ListSearch onMove={this.getBooks} books={this.state.books} booksSearch={this.state.booksSearch} />
 
 
 

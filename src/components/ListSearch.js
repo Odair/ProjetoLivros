@@ -1,12 +1,14 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
+import { Debounce } from 'react-throttle';
 import { Link } from 'react-router-dom'
 import * as BooksAPI from '../BooksAPI'
 
-class ListSearch extends Component {
+class ListSearch extends PureComponent {
 
     state = {
         query: '',
         results: [],
+        books: [],
         erro: false
     }
 
@@ -18,11 +20,20 @@ class ListSearch extends Component {
         if (query) {
             BooksAPI.search(query, 20)
                 .then((results) => {
+                    results.map((book) => {
+                        this.props.books.map((book_) => {
+                            if (book.id === book_.id) {
+                                book.shelf = book_.shelf
+                            }
+                        })
+                    })
                     results.length > 0 ? this.setState({ results: results, erro: false }) : this.setState({ results: [], erro: true })
                 })
                 .catch(error => {
                     console.log(error)
                 })
+
+
         }
     }
 
@@ -45,7 +56,9 @@ class ListSearch extends Component {
                 <div className="search-books-bar">
                     <Link className="close-search" to='/'>Close</Link>
                     <div className="search-books-input-wrapper">
-                        <input type="text" placeholder="Search by title or author" onChange={(event) => this.updateQuery(event.target.value)} />
+                        <Debounce time="400" handler="onChange">
+                            <input type="text" placeholder="Search by title or author" onChange={(event) => this.updateQuery(event.target.value)} />
+                        </Debounce>
                     </div>
                 </div>
                 <div className="search-books-results">
